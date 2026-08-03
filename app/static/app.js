@@ -198,21 +198,32 @@ let currentTab = 'weight';
 
 const TAB_CONFIG = {
   weight: {
-    cols: ['Дата', 'Вес, кг', ''],
+    cols: ['Дата', 'Вес, кг', 'Заметка', ''],
     rows: () => state.weight.slice().reverse().map(x => [x.weight_date, x.weight_kg.toFixed(1),
+      noteCell(x.notes),
       delBtn(() => removeWeight(x.weight_date))]),
   },
   nutrition: {
-    cols: ['Дата', 'Ккал', 'Белок', ''],
+    cols: ['Дата', 'Ккал', 'Белок', 'Заметка', ''],
     rows: () => state.nutrition.slice().reverse().map(x => [x.nutrition_date, x.calories ?? '—', x.protein_g ?? '—',
+      noteCell(x.notes),
       delBtn(() => removeNutrition(x.nutrition_date))]),
   },
   workouts: {
-    cols: ['Дата', 'Тип', 'Мин', 'Интенс.', ''],
+    cols: ['Дата', 'Тип', 'Мин', 'Интенс.', 'Заметка', ''],
     rows: () => state.workouts.map(x => [x.workout_date, typeLabel(x.workout_type), x.duration_min, intensityLabel(x.intensity),
+      noteCell(x.notes),
       delBtn(() => removeWorkout(x.id))]),
   },
 };
+
+function noteCell(note) {
+  if (!note) return '—';
+  const span = document.createElement('span');
+  span.textContent = note.length > 80 ? note.slice(0, 80) + '…' : note;
+  span.title = note;
+  return span;
+}
 
 const TYPE_LABELS = { gym: 'Зал', boxing: 'Бокс', cardio: 'Кардио', other: 'Другое' };
 const INT_LABELS = { low: '↓', medium: '→', high: '↑' };
