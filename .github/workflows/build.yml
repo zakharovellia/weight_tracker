@@ -24,13 +24,22 @@ jobs:
           TS=$(date -u +%Y%m%d)
           echo "tag=${TS}-${SHORT_SHA}" >> $GITHUB_OUTPUT
 
+      - name: Normalize registry
+        id: registry
+        env:
+          NEXUS_REGISTRY: ${{ secrets.NEXUS_REGISTRY }}
+        run: |
+          VAL="$(echo "$NEXUS_REGISTRY" | tr -d '[:space:]' | sed 's|^https\?://||' | sed 's|/$||')"
+          echo "value=${VAL}" >> "$GITHUB_OUTPUT"
+          echo "registry=${VAL}"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Nexus
         uses: docker/login-action@v3
         with:
-          registry: ${{ secrets.NEXUS_REGISTRY }}
+          registry: ${{ steps.registry.outputs.value }}
           username: ${{ secrets.NEXUS_USERNAME }}
           password: ${{ secrets.NEXUS_PASSWORD }}
 
@@ -41,8 +50,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.NEXUS_REGISTRY }}/weight_tracker:${{ steps.tag.outputs.tag }}
-            ${{ secrets.NEXUS_REGISTRY }}/weight_tracker:latest
+            ${{ steps.registry.outputs.value }}/weight_tracker:${{ steps.tag.outputs.tag }}
+            ${{ steps.registry.outputs.value }}/weight_tracker:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
@@ -62,7 +71,7 @@ jobs:
         working-directory: devops
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-          REGISTRY: ${{ secrets.NEXUS_REGISTRY }}
+          REGISTRY: ${{ steps.registry.outputs.value }}
         run: |
           set -euo pipefail
           FILE="k3s/weight-tracker.yml"
