@@ -4,7 +4,7 @@
 
 ## Проект
 
-Личный трекер веса, питания и тренировок: FastAPI + vanilla JS + Chart.js (всё локально, без CDN). Репозиторий `zakharovellia/weight_tracker-`.
+Личный трекер веса, питания и тренировок: FastAPI + vanilla JS + Chart.js (всё локально, без CDN). Репозиторий `zakharovellia/weight_tracker`.
 
 - БД: PostgreSQL `postgres.storage:5432`, схема `weight` (`daily_weight`, `daily_nutrition`, `workouts`).
 - Локальный запуск: `uv venv .venv && source .venv/bin/activate && uv pip install -r requirements.txt`, затем `uvicorn app.main:app --host 0.0.0.0 --port 8000` (пароль БД — из окружения, не коммитить).
